@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>3D Model Viewer - Standing Figure</title>
+  <script type="module" src="https://unpkg.com/@google/model-viewer/dist/model-viewer.min.js"></script>
+  <style>
+    body { margin: 0; overflow: hidden; background: #f0f0f0; font-family: sans-serif; }
+    model-viewer { width: 100vw; height: 100vh; }
+    .tip {
+      position: fixed; bottom: 16px; left: 50%; transform: translateX(-50%);
+      background: rgba(255,255,255,0.9); padding: 8px 16px; border-radius: 20px;
+      font-size: 13px; color: #555; pointer-events: none;
+    }
+  </style>
+</head>
+<body>
+  <model-viewer src="girlfriend_standing.glb"
+    camera-controls auto-rotate shadow-intensity="1">
+  </model-viewer>
+  <div class="tip">站立版 · 拖动旋转 · 滚轮缩放 · 右键平移</div>
+</body>
+</html>
