@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>手机扫描 + v2 模型结合操作单</title><style>
+*{box-sizing:border-box}
+body{margin:0;padding:0;background:#0f1115;color:#dfe3ea;
+font:16px/1.75 -apple-system,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif;}
+.wrap{max-width:900px;margin:0 auto;padding:32px 20px 120px}
+h1{font-size:27px;line-height:1.35;margin:.2em 0 .8em;color:#fff;letter-spacing:-.3px}
+h2{font-size:21px;margin:2.2em 0 .7em;padding-bottom:.35em;border-bottom:1px solid #262b36;color:#8ab4ff}
+h3{font-size:17px;margin:1.6em 0 .5em;color:#ffd479}
+h4{font-size:15px;margin:1.2em 0 .4em;color:#9fe3b0}
+p{margin:.7em 0}
+ul,ol{padding-left:1.4em;margin:.6em 0}
+li{margin:.3em 0}
+strong{color:#fff}
+code{background:#1b2029;border:1px solid #2a3040;border-radius:4px;padding:1px 5px;
+font:13px/1.4 ui-monospace,Consolas,monospace;color:#9fe3b0;word-break:break-all}
+pre{background:#151a22;border:1px solid #2a3040;border-radius:8px;padding:14px 16px;overflow-x:auto}
+pre code{background:none;border:none;padding:0;color:#c8d3e0}
+table{width:100%;border-collapse:collapse;margin:1em 0;font-size:14px;display:block;overflow-x:auto}
+th,td{border:1px solid #2a3040;padding:8px 10px;text-align:left;vertical-align:top}
+th{background:#1b2029;color:#8ab4ff;font-weight:600;white-space:nowrap}
+tr:nth-child(even) td{background:#131820}
+blockquote{margin:1em 0;padding:.6em 1em;border-left:3px solid #ffd479;background:#1a1708;color:#e8dcb8;border-radius:0 6px 6px 0}
+blockquote p{margin:.25em 0}
+hr{border:none;border-top:1px solid #262b36;margin:2.4em 0}
+a{color:#8ab4ff}
+.nav{position:sticky;top:0;background:rgba(15,17,21,.94);backdrop-filter:blur(8px);
+border-bottom:1px solid #262b36;padding:10px 20px;font-size:13px;z-index:9;margin:-32px -20px 20px}
+.nav a{display:inline-block;margin:3px 12px 3px 0;text-decoration:none;color:#8b95a7}
+.nav a:hover{color:#8ab4ff}
+@media print{body{background:#fff;color:#111}.nav{display:none}
+h2{color:#000;border-color:#ccc}h3,h4{color:#000}th{background:#eee;color:#000}
+td,th{border-color:#ccc}tr:nth-child(even) td{background:#fafafa}
+blockquote{background:#fffbe6;border-color:#d4a017;color:#333}code{background:#f2f2f2;color:#0a6}}
+</style></head>
+<body><div class="nav"><a href="#0">0 · 先把预期钉死：扫描能补什么，补不了什么</a><a href="#1-15cm">1 · 先算一笔账：扫描的脸，缩到 15cm 还剩多少细节？</a><a href="#2">2 · 拍摄：把这段直接转发给她</a><a href="#3">3 · 重建：用哪个工具</a><a href="#4-v2">4 · 核心：和 v2 怎么结合（三条路线）</a><a href="#5-blender">5 · 扫描质量验收（在 Blender 里看这四处）</a><a href="#6">6 · 时间账：这条路到底值不值</a><a href="#7">7 · 如果她实在不方便拍（备选）</a><a href="#8">8 · 回家后的执行顺序（把这篇和主手册合起来用）</a></div><div class="wrap"><h1 id="v2">手机扫描 → 和 v2 模型结合：完整操作单</h1>
+<blockquote>
+<p>前提：她用的是 iPhone，能帮你拍一段 3 分钟环绕视频
+你要的结果：一个比现在 v2 更像、而且能直接打印的 15cm 手办
+读完这篇大概 8 分钟，知道该怎么指挥、怎么合并</p>
+</blockquote>
+<hr />
+<h2 id="0">0 · 先把预期钉死：扫描能补什么，补不了什么</h2>
+<p>这张表决定了后面所有操作，<strong>先看它</strong>：</p>
+<table>
+<thead>
+<tr>
+<th>维度</th>
+<th>单图 AI（你现在 v2）</th>
+<th>手机扫描</th>
+<th>谁赢</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>整体身高比例</td>
+<td>猜的，可能有偏差</td>
+<td><strong>真实测量</strong></td>
+<td>扫描 ✅</td>
+</tr>
+<tr>
+<td>服装褶皱走向</td>
+<td>AI 想象</td>
+<td><strong>真实</strong></td>
+<td>扫描 ✅</td>
+</tr>
+<tr>
+<td>姿态（头转多少度、肩多宽）</td>
+<td>近似，头转了 15-20°</td>
+<td><strong>精确</strong></td>
+<td>扫描 ✅</td>
+</tr>
+<tr>
+<td><strong>脸部凹凸</strong>（颧骨、鼻梁、下颌、眼窝）</td>
+<td>几乎没有，一团糊</td>
+<td><strong>有真实起伏</strong></td>
+<td>扫描 ✅✅</td>
+</tr>
+<tr>
+<td>头发</td>
+<td>块面，还算像</td>
+<td><strong>糊成一坨 + 边缘漂浮噪点</strong></td>
+<td><strong>v2 ✅</strong></td>
+</tr>
+<tr>
+<td>网格质量</td>
+<td>水密、单件、可直打</td>
+<td>有洞、有噪点、可能多件</td>
+<td><strong>v2 ✅✅</strong></td>
+</tr>
+<tr>
+<td>纹理</td>
+<td>碎 atlas，脸上没五官像素</td>
+<td>可用的真实照片纹理</td>
+<td>扫描 ✅</td>
+</tr>
+</tbody>
+</table>
+<p><strong>一句话结论</strong>：扫描赢在「数据真实」，输在「网格干净」和「头发」。
+所以结合方式不是"用扫描替换 v2"，而是——</p>
+<blockquote>
+<p><strong>用扫描提供准确数据，用 v2 提供可打印的干净壳子。</strong></p>
+</blockquote>
+<hr />
+<h2 id="1-15cm">1 · 先算一笔账：扫描的脸，缩到 15cm 还剩多少细节？</h2>
+<p>很多人以为"手机扫描精度不够做手办"，这个判断是错的，我算给你看：</p>
+<table>
+<thead>
+<tr>
+<th>项</th>
+<th>真人</th>
+<th>缩到 15cm 手办后</th>
+<th>光固化能表现吗（0.05mm 层高）</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>身高</td>
+<td>1620 mm</td>
+<td>150 mm（比例 0.0926）</td>
+<td>—</td>
+</tr>
+<tr>
+<td>脸宽</td>
+<td>约 140 mm</td>
+<td>13 mm</td>
+<td>能</td>
+</tr>
+<tr>
+<td>鼻梁高度</td>
+<td>约 15 mm</td>
+<td>1.4 mm</td>
+<td>能</td>
+</tr>
+<tr>
+<td>眼窝深度</td>
+<td>约 8 mm</td>
+<td>0.74 mm</td>
+<td>能</td>
+</tr>
+<tr>
+<td>手机扫描精度</td>
+<td>约 1-2 mm</td>
+<td>0.09-0.19 mm</td>
+<td><strong>远超需求</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>结论</strong>：瓶颈不在扫描精度，在打印工艺。手机扫描的脸，缩到 15cm 后细节绰绰有余。</p>
+<p><strong>但有个前提</strong>：扫描出来的脸必须"干净"。人只要微动一下，脸就变成两张脸叠在一起（鬼影）。所以第 2 章的拍摄动作是决定成败的 80%。</p>
+<hr />
+<h2 id="2">2 · 拍摄：把这段直接转发给她</h2>
+<blockquote>
+<p>下面这段可以整段转发微信，她照着做就行。也可以单独看 <code>scan-checklist-for-her.txt</code></p>
+</blockquote>
+<hr />
+<p><strong>帮个忙，拍个 3 分钟的小视频 🙏</strong></p>
+<p><strong>穿什么</strong>：就穿照片里那套——白衬衫、绿格裙、白袜、乐福鞋，包也拎着。
+<strong>头发</strong>：保持披肩放下，不要扎。
+<strong>站哪</strong>：找一面干净的墙（或拉上的窗帘），前面两米内别放东西。光线找阴天或者靠窗的室内，<strong>千万别站在太阳直射下</strong>（会出一堆奇怪的影子）。</p>
+<p><strong>怎么拍</strong>：找个人帮你，手机开 <strong>4K 30fps 视频</strong>，绕着你走两圈：
+- 第一圈：手机放在胸口高度，离你 1.5-2 米，<strong>慢慢走一整圈</strong>，大概 40 秒
+- 第二圈：手机抬到眼睛高度，稍微俯一点，再走一圈，40 秒</p>
+<p><strong>你只需要做一件事：像木头人一样别动。</strong> 眼睛可以眨，但头别转、手别晃、别笑到变形。</p>
+<p><strong>再补拍</strong>：视频拍完，用普通相机再拍 20-30 张照片——正面、左右 45°、侧面、背面各来几张，再单独拍头顶、脸、手、包的近照。</p>
+<p><strong>最容易搞砸的三件事</strong>：
+1. 站着晃来晃去 → 出来两个你
+2. 站在太阳底下 → 阴影被当成身体的一部分
+3. 手机走太快 → 画面糊，重建失败</p>
+<p>拍完直接发我，谢谢！</p>
+<hr />
+<h3 id="21-6">2.1 拍摄的 6 条硬标准（你自己心里有数）</h3>
+<table>
+<thead>
+<tr>
+<th>#</th>
+<th>项</th>
+<th>标准</th>
+<th>为什么</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>衣服必须是照片里那套</strong></td>
+<td>白衬衫 + 绿格裙 + 白袜 + 乐福鞋 + 棕包</td>
+<td>不然扫出来的衣服和 v2 对不上，没法结合</td>
+</tr>
+<tr>
+<td>2</td>
+<td>发型和照片一致</td>
+<td>披肩放下来</td>
+<td>头发是最大难点，但至少轮廓要对</td>
+</tr>
+<tr>
+<td>3</td>
+<td>背景干净</td>
+<td>纯色墙 / 窗帘</td>
+<td>杂物会被扫进模型</td>
+</tr>
+<tr>
+<td>4</td>
+<td>光线</td>
+<td><strong>漫射光</strong>（阴天、窗边），禁止直射阳光、禁止顶灯硬光</td>
+<td>硬光产生硬阴影，重建会当成几何</td>
+</tr>
+<tr>
+<td>5</td>
+<td>人必须静止</td>
+<td>2-3 分钟不动</td>
+<td>动了就是"鬼影"，脸废掉</td>
+</tr>
+<tr>
+<td>6</td>
+<td>手机稳且匀速</td>
+<td>别停、别抖、别变焦</td>
+<td>帧间特征匹配失败就重建不出</td>
+</tr>
+</tbody>
+</table>
+<h3 id="22-vs">2.2 视频 vs 照片，用哪个？</h3>
+<p><strong>两个都要。</strong></p>
+<table>
+<thead>
+<tr>
+<th>输入</th>
+<th>作用</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>视频（2 圈环绕）</strong></td>
+<td>主重建数据</td>
+<td>帧间连续，特征匹配成功率高，而且不用她反复配合按快门</td>
+</tr>
+<tr>
+<td><strong>照片 20-30 张</strong></td>
+<td>补细节、补死角</td>
+<td>头顶、脚底、包的侧面、脸部近照，这些视频里容易糊</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>大部分重建 App 都支持「视频导入 + 照片补充」混合，两个一起喂效果最好。</p>
+</blockquote>
+<hr />
+<h2 id="3">3 · 重建：用哪个工具</h2>
+<p>按国内可用性和上手速度排序：</p>
+<table>
+<thead>
+<tr>
+<th>工具</th>
+<th>平台</th>
+<th>费用</th>
+<th>优点</th>
+<th>缺点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Kiri Engine</strong></td>
+<td>iOS / Android</td>
+<td>免费额度大，Pro 便宜</td>
+<td>支持视频导入、中文界面、上手最快</td>
+<td>精度中等</td>
+</tr>
+<tr>
+<td><strong>Polycam</strong></td>
+<td>iOS</td>
+<td>免费额度少，Pro 约 $8/月</td>
+<td>精度最好，有 LiDAR 辅助</td>
+<td>国内网络不稳，需付费</td>
+</tr>
+<tr>
+<td>Meshroom</td>
+<td>Windows 本地</td>
+<td>免费</td>
+<td>不限量</td>
+<td>需要 NVIDIA 显卡 ≥6GB，慢，难用</td>
+</tr>
+<tr>
+<td>RealityCapture</td>
+<td>Windows 本地</td>
+<td>个人免费</td>
+<td>质量最高</td>
+<td>需要好显卡，学习成本高</td>
+</tr>
+</tbody>
+</table>
+<p><strong>推荐：先 Kiri Engine。</strong> 免费额度够跑 1-2 次，失败也不心疼。</p>
+<h3 id="31-iphone-lidar">3.1 iPhone 有没有 LiDAR？先确认</h3>
+<ul>
+<li><strong>有</strong>：iPhone 12 Pro / 13 Pro / 14 Pro / 15 Pro / 16 Pro / 17 Pro 系列（Pro 及 Pro Max）</li>
+<li><strong>没有</strong>：iPhone 12-17 的标准版、mini、Plus、SE</li>
+</ul>
+<p>有 LiDAR 的话，重建时<strong>开启 LiDAR 辅助</strong>，能救回纯色区域（白衬衫、白袜子这种没纹理的地方最容易重建失败）。
+没有也不影响，靠拍照纹理也能重建，只是白衣服部分要指望那 20 张补拍照片。</p>
+<h3 id="32">3.2 导出格式</h3>
+<p>要 <strong><code>.obj</code>（带 mtl + 贴图）</strong> 或 <strong><code>.ply</code></strong>。
+不要只要 <code>.glb</code>——部分工具有损压缩，会把细节抹掉。</p>
+<hr />
+<h2 id="4-v2">4 · 核心：和 v2 怎么结合（三条路线）</h2>
+<p>按难度从低到高。<strong>先做 A，A 做完再看要不要上 B。</strong></p>
+<hr />
+<h3 id="a-v2-1-15">路线 A · 扫描当"标尺"，v2 当"成品"（最稳，1-1.5 小时）★推荐先做</h3>
+<p><strong>思路</strong>：不和扫描硬合并，只用它的<strong>轮廓数据</strong>去校正 v2 的比例。</p>
+<h4 id="_1">为什么这条最稳</h4>
+<ul>
+<li>不破坏 v2（随时能退回）</li>
+<li>v2 网格干净、水密、单件、能直接打印——这些是扫描给不了的</li>
+<li>你现在的核心问题（头转了 15-20°、脸型偏长、裙长不对）全都能靠"三条真实轮廓线"解决</li>
+</ul>
+<h4 id="_2">操作步骤</h4>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>操作</th>
+<th>标准</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Blender 里 <strong>File → Import</strong> 分别导入扫描模型（obj/ply）和 v2 的 glb</td>
+<td>两个都在场景里</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>先把扫描模型归位</strong>：选中它 → <code>Alt+G</code>（清位置）→ <code>Alt+R</code>（清旋转）→ 右键 → Set Origin → <strong>Origin to Geometry</strong></td>
+<td>原点在模型中心</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>缩放扫描到 150mm</strong>：选中 → 按 <code>S</code>，输入 <code>150/当前高度</code></td>
+<td>N 面板 Dimensions 的 Z ≈ 150</td>
+</tr>
+<tr>
+<td>4</td>
+<td>同样把 v2 弄到 150mm 高（流程和手册第 3 章一样）</td>
+<td>两个都是 150mm</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>都落到地面</strong>：编辑模式选中模型最低的一个点，<code>Shift+S → Cursor to Selected</code>，回物体模式 <code>Shift+S → Selection to Cursor</code>；再把游标归零 <code>Shift+C</code></td>
+<td>两个模型的脚底都在 z=0</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>都居中</strong>：物体模式选中 → 右键 Set Origin → Origin to Geometry → <code>Alt+G</code></td>
+<td>两个模型原点重合</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>把扫描设为半透明参考</strong>：选中扫描 → 右侧 Object Properties → <strong>Viewport Display</strong> → Display As 选 <strong>Wire</strong>（或材质里把 Alpha 降到 0.3）</td>
+<td>能看到扫描的线框穿过 v2</td>
+</tr>
+<tr>
+<td>8</td>
+<td><strong>比对三视图</strong>：<code>Numpad 1</code> 正面、<code>Numpad 3</code> 侧面、<code>Numpad 7</code> 顶面，逐个看</td>
+<td>记下偏差：头大小、肩宽、裙长、腿粗细、包位置</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>锁住扫描</strong>：大纲视图点扫描模型的<strong>锁头图标</strong>，防止误操作</td>
+<td>它动不了也不会被导出</td>
+</tr>
+<tr>
+<td>10</td>
+<td>选中 v2，进雕刻模式，<strong>对着扫描轮廓 Grab 拉</strong></td>
+<td>按第 5 步的清单逐项对齐</td>
+</tr>
+<tr>
+<td>11</td>
+<td>全部改完 → 选中扫描 → <code>X</code> 删除 → v2 导出 STL</td>
+<td>手册第 6 章的体检流程</td>
+</tr>
+</tbody>
+</table>
+<h4 id="10">第 10 步具体的"对着拉"清单（按优先级）</h4>
+<table>
+<thead>
+<tr>
+<th>优先</th>
+<th>改什么</th>
+<th>怎么看</th>
+<th>目标</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>头的朝向和大小</strong></td>
+<td>正视图</td>
+<td>鼻子中线对齐扫描，头围一致</td>
+</tr>
+<tr>
+<td>2</td>
+<td><strong>肩宽</strong></td>
+<td>正视图</td>
+<td>肩峰点和扫描重合</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>裙摆下沿高度</strong></td>
+<td>正视图</td>
+<td>和扫描重合（这条最能量化）</td>
+</tr>
+<tr>
+<td>4</td>
+<td><strong>腿的粗细</strong></td>
+<td>正视图 + 侧视图</td>
+<td>别差超过 2mm</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>脸型轮廓</strong></td>
+<td>正视图 + 侧视图</td>
+<td>下颌线和颧骨位置对齐扫描</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>头发体积</strong></td>
+<td>三个视图</td>
+<td>整体轮廓包住扫描的头发（扫描的头发糊，只要外轮廓）</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>包的位置和大小</strong></td>
+<td>正视图 + 侧视图</td>
+<td>包底高度、离身体的间距</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p><strong>技巧</strong>：改的时候把 v2 也切成半透明（材质 Alpha 0.5），两个叠在一起，偏差一眼就看见。</p>
+</blockquote>
+<hr />
+<h3 id="b-2-3">路线 B · 切头换头（要"脸真的像"就走这条，2-3 小时）</h3>
+<p><strong>思路</strong>：v2 保留身体和衣服（AI 做的这些其实不错，而且干净），<strong>头换成扫描的</strong>。</p>
+<h4 id="_3">什么时候值得做</h4>
+<p>先在 Blender 里打开扫描模型，放大看脸：
+- ✅ 能看到鼻梁、颧骨、下颌线的起伏，眼睛位置有凹陷 → <strong>值得做</strong>
+- ❌ 完全平滑，或者一片噪点 → 说明拍废了，别做，回路线 A</p>
+<h4 id="_4">操作步骤</h4>
+<table>
+<thead>
+<tr>
+<th>步</th>
+<th>操作</th>
+<th>关键点</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>清理扫描的脸</strong>：雕刻模式，用 Smooth（按住 Shift）把噪点抹平；编辑模式框选删掉头发部分</td>
+<td>只留<strong>脸 + 脖子 + 耳朵</strong>，头发全删（后面用 v2 的补）</td>
+</tr>
+<tr>
+<td>2</td>
+<td>扫描的头缩放到和 v2 的头一样大（用路线 A 的对齐方法，对齐好后 <code>S</code> 微调）</td>
+<td>头高一致</td>
+</tr>
+<tr>
+<td>3</td>
+<td><strong>v2 切脖子</strong>：编辑模式，<code>Alt+左键</code>环选脖子上的一圈边（挑一个平的、曲率小的截面）</td>
+<td>环选要选通整圈，别断</td>
+</tr>
+<tr>
+<td>4</td>
+<td><code>V</code> 断开（Rip）或者 <code>P → Selection</code> 把头部单独分离出来</td>
+<td>现在 v2 的头能单独删了</td>
+</tr>
+<tr>
+<td>5</td>
+<td>删掉 v2 的头，只留身体</td>
+<td>—</td>
+</tr>
+<tr>
+<td>6</td>
+<td><strong>对齐接缝</strong>：把扫描的头挪到脖子断面上，让两个环形边界大致贴合</td>
+<td>边界顶点数不一样也没关系</td>
+</tr>
+<tr>
+<td>7</td>
+<td><strong>桥接</strong>：同时选中两个物体的边界环 → <code>Ctrl+E</code> → <strong>Bridge Edge Loops</strong></td>
+<td>出来一圈桥接面</td>
+</tr>
+<tr>
+<td>8</td>
+<td>如果桥接出问题（扭曲）：先 <code>Ctrl+J</code> 合并两个物体，再用 <strong>Remesh（Voxel，体素 0.25mm）</strong> 整体融合</td>
+<td>Voxel Remesh 会重做拓扑，但一定能焊死</td>
+</tr>
+<tr>
+<td>9</td>
+<td><strong>补头发</strong>：从 v2 上复制头发部分（<code>Shift+D</code>），缩放对齐盖到扫描的头顶，<code>Ctrl+J</code> 合并</td>
+<td>扫描的头发糊，用 v2 的块面盖住</td>
+</tr>
+<tr>
+<td>10</td>
+<td>用 Smooth 抹平接缝，Crease 压一道颈纹盖住</td>
+<td>打印后打磨 + 补土能处理</td>
+</tr>
+</tbody>
+</table>
+<h4 id="_5">这条路线最大的坑</h4>
+<table>
+<thead>
+<tr>
+<th>坑</th>
+<th>现象</th>
+<th>解法</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>脖子接缝歪</td>
+<td>头装上去像"歪脖子"</td>
+<td>回第 6 步重新对齐，别硬焊</td>
+</tr>
+<tr>
+<td>头身比例不对</td>
+<td>头大或头小</td>
+<td>扫描的头必须按"头高"缩放，不是按"整体"</td>
+</tr>
+<tr>
+<td>Voxel Remesh 后变糊</td>
+<td>脸被磨平</td>
+<td>体素别超过 0.3mm；或者干脆不用 Remesh，用 Bridge 做</td>
+</tr>
+<tr>
+<td>头发盖不住</td>
+<td>头顶露一块扫描的烂面</td>
+<td>Draw 笔刷补料</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h3 id="c">路线 C · 全用扫描（只有扫得特别好才走）</h3>
+<p><strong>判据</strong>：在 Blender 里看扫描模型——整体完整、没有大洞、头发是<strong>块状</strong>而不是一堆毛。</p>
+<p>如果满足：
+1. 编辑模式框选删掉所有"漂浮的小三角面"（噪点）
+2. <code>Mesh → Clean Up → Fill Holes</code> 补洞
+3. 雕刻模式 Smooth 整体过一遍
+4. 缩到 150mm → 加底座 → 体检 → 出 STL</p>
+<p><strong>问题</strong>：头发的块面质量一定不如 v2，需要你重塑一次。
+<strong>所以除非扫得特别好，否则还是走 A 或 B。</strong></p>
+<hr />
+<h2 id="5-blender">5 · 扫描质量验收（在 Blender 里看这四处）</h2>
+<table>
+<thead>
+<tr>
+<th>部位</th>
+<th>✅ 合格</th>
+<th>❌ 不合格</th>
+<th>不合格怎么办</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>脸</strong></td>
+<td>有鼻梁/颧骨/下颌起伏</td>
+<td>一片平滑或一片噪点</td>
+<td>重拍（光线问题）</td>
+</tr>
+<tr>
+<td><strong>头发</strong></td>
+<td>有整体轮廓</td>
+<td>边缘"爆炸"的漂浮三角面</td>
+<td>只能删掉，用 v2 的头发补</td>
+</tr>
+<tr>
+<td><strong>手</strong></td>
+<td>能看出是手，手指有分界</td>
+<td>糊成一个球</td>
+<td>用 v2 的手 + 雕刻</td>
+</tr>
+<tr>
+<td><strong>鞋</strong></td>
+<td>分得出鞋和地面</td>
+<td>和地面粘一起</td>
+<td>编辑模式切掉地面</td>
+</tr>
+</tbody>
+</table>
+<p><strong>关键判断</strong>：如果脸不合格，<strong>路线 B 直接放弃</strong>，别浪费时间修——重拍 3 分钟比修 3 小时划算。</p>
+<hr />
+<h2 id="6">6 · 时间账：这条路到底值不值</h2>
+<table>
+<thead>
+<tr>
+<th>环节</th>
+<th>耗时</th>
+<th>谁做</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>拍摄</td>
+<td>3-5 分钟</td>
+<td>她 + 帮忙拍的人</td>
+</tr>
+<tr>
+<td>重建（Kiri/Polycam 云端）</td>
+<td>10-30 分钟（等）</td>
+<td>电脑</td>
+</tr>
+<tr>
+<td>下载 + 导入 Blender</td>
+<td>10 分钟</td>
+<td>你</td>
+</tr>
+<tr>
+<td>对齐 + 路线 A 校正</td>
+<td>1-1.5 小时</td>
+<td>你</td>
+</tr>
+<tr>
+<td>（可选）路线 B 换头</td>
+<td>+2 小时</td>
+<td>你</td>
+</tr>
+<tr>
+<td>清理 + 导出 STL</td>
+<td>30 分钟</td>
+<td>你</td>
+</tr>
+</tbody>
+</table>
+<p><strong>总投入</strong>：她 5 分钟，你 2-4 小时。</p>
+<p><strong>对比</strong>：纯在 Blender 里盲改 v2（没有扫描）→ 你只能靠眼睛和照片比对，改出来的东西依然"像个人但不像她"。</p>
+<p><strong>值不值</strong>：值。因为你现在缺的不是"手艺"，是"数据"。她 5 分钟能给你的数据，比你在 Blender 里瞎猜 10 小时管用。</p>
+<hr />
+<h2 id="7">7 · 如果她实在不方便拍（备选）</h2>
+<table>
+<thead>
+<tr>
+<th>方案</th>
+<th>需要</th>
+<th>效果</th>
+<th>成本</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>找她之前的其他照片（不同角度，3-5 张）</td>
+<td>翻相册</td>
+<td>中（可以多视角图生 3D，比单图强）</td>
+<td>免费</td>
+</tr>
+<tr>
+<td>淘宝/闲鱼「人像 3D 建模」</td>
+<td>3-5 张照片</td>
+<td>★★★★（人工雕刻，最像）</td>
+<td>200-500 元</td>
+</tr>
+<tr>
+<td>放弃写实，走 Q 版/风格化</td>
+<td>—</td>
+<td>承认差异，用"可爱"代替"像"</td>
+<td>免费</td>
+</tr>
+<tr>
+<td>换产品形态（照片浮雕/亚克力立牌）</td>
+<td>照片</td>
+<td>★★★★★（因为是照片本身）</td>
+<td>50-150 元</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="8">8 · 回家后的执行顺序（把这篇和主手册合起来用）</h2>
+<pre><code>第 1 天（她拍完之前）
+  └─ 按主手册走一遍 v2 的 Blender 改造（S1-S7）
+     → 这一步不白做：扫描来了以后，v2 依然是最终交付的壳子
+
+第 1 天晚上（她拍完，你拿到视频）
+  └─ 上传 Kiri Engine / Polycam，睡前挂着重建
+
+第 2 天
+  └─ 下载扫描 → 路线 A 对齐校正（1-1.5 小时）
+     → 出第一个&quot;有真实比例&quot;的 STL
+
+第 3 天（可选）
+  └─ 扫描的脸质量好 → 路线 B 换头
+</code></pre>
+<p><strong>核心提醒</strong>：<strong>a 和 b 不是二选一，是先后关系。</strong> 扫描来了不代表 v2 白改——v2 的干净网格是扫描永远给不了的。</p>
+<hr />
+<p><em>配套文件：<code>blender-figure-tuneup-handbook.html</code>（主改造手册）、<code>scan-checklist-for-her.txt</code>（转发版拍摄清单）</em></p></div></body></html>

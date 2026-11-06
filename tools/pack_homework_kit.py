@@ -10,6 +10,9 @@ FILES = [
     ("tmp_3dgen/input_resized_v2.jpg", "input_resized_v2.jpg"),
     ("blender-figure-tuneup-handbook.html", "handbook.html"),
     ("blender-figure-tuneup-handbook.md", "handbook.md"),
+    ("scan-merge-guide.html", "scan-merge-guide.html"),
+    ("scan-merge-guide.md", "scan-merge-guide.md"),
+    ("scan-checklist-for-her.txt", "scan-checklist-for-her.txt"),
     ("tools/blender_figure_helper.py", "blender_figure_helper.py"),
 ]
 
@@ -36,6 +39,9 @@ README = """回家开工说明
   2. 头发改对，人就有一半像了。
   3. 头掰正，正脸朝前。
   4. 交付走「光固化素模 + 找人代涂」，比全彩打印像得多。
+  5. 如果能让她拍一段环绕视频，扫描路线的数据比你手改强一个量级
+     -> 看 scan-merge-guide.html，那是"扫描怎么和 v2 结合"的完整操作单
+     -> scan-checklist-for-her.txt 是可以直接转发给她照着拍的清单
 
 五、blender_figure_helper.py 怎么用：
   Blender 顶部切到 Scripting 工作区 -> Open 选它 -> 点右上角播放键
